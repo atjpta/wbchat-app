@@ -9,7 +9,7 @@
             </n-alert>
     </div>
     <Form
-        @submit="registration"
+        @submit="handleRegister"
         :validation-schema="userFormSchema"
         class="flex justify-center my-20 bg-gradient-to-l from-sky-100 to-sky-500/50 min-w-max max-w-xl rounded-3xl p-10 mx-auto text-lg"
     >
@@ -20,7 +20,7 @@
                 name="username"
                 type="text"
                 class="rounded-md bg-gray-800/10"
-                v-model="username"
+                v-model="user.username"
             />
             <div class="text-red-900">
                 <ErrorMessage name="username" class="error-feedback" />
@@ -32,7 +32,7 @@
                 name="name"
                 type="text"
                 class="rounded-md bg-gray-800/10"
-                v-model="name"
+                v-model="user.name"
             />
             <div class="text-red-900">
                 <ErrorMessage name="name" class="error-feedback" />
@@ -44,7 +44,7 @@
                 name="email"
                 type="email"
                 class="rounded-md bg-gray-800/10"
-                v-model="email"
+                v-model="user.email"
             />
             <div class="text-red-900">
                 <ErrorMessage name="email" class="error-feedback" />
@@ -56,7 +56,7 @@
                 name="password"
                 type="password"
                 class="rounded-md bg-gray-800/10"
-                v-model="password"
+                v-model="user.password"
             />
             <div class="text-red-900">
                 <ErrorMessage name="password" class="error-feedback" />
@@ -92,33 +92,14 @@
 <script>
 import * as Yup from "yup";
 import { Form, Field, ErrorMessage } from "vee-validate";
-import authService from "../services/auth.service";
+import { mapActions } from "pinia";
+import { useAuthStore } from "@/stores/auth.store";
+
 export default {
     components: {
         Form,
         Field,
         ErrorMessage,
-    },
-    methods: {
-        async registration(){
-            this.message = "";
-            this.error = "";
-            try{
-                await authService.create(
-                {
-                    username: this.username,
-                    email: this.email,
-                    password: this.password,
-                    name : this.name,
-                }
-            );
-                this.message = "Bạn đã đăng kí thành công";
-            }
-            catch(error){
-                console.log(error);
-                this.error = "Trùng user name hoặc mật khẩu!!";
-            }
-        }
     },
     data() {
         const userFormSchema = Yup.object().shape({
@@ -149,15 +130,35 @@ export default {
         return {
             // Chúng ta sẽ không muốn hiệu chỉnh props, nên tạo biến cục bộ
             //  để liên kết với các input trên form
-            username: "",
-            name :"",
-            email: "",
-            password: "",
+            user:{}, 
             userFormSchema,
             message: "",
             error:"",
         };
     },
+    methods: {
+        ...mapActions(useAuthStore, ["register"]),
+		async handleRegister(user) {
+			this.message = "";
+			this.successful = false;
+			this.loading = true;
+
+			try {
+				const data = await this.register(user);
+
+				this.message = data.message;
+				this.successful = true;
+				this.loading = false;
+			} catch (error) {
+				console.log(error);
+
+				this.message = "Đã có lỗi xảy ra.";
+				this.successful = false;
+				this.loading = false;
+			}
+		},
+    },
+    
     
 };
 </script>

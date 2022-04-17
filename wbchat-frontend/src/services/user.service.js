@@ -1,8 +1,9 @@
-import createHttp from "./http.service";
+import { createApiClient } from "./api.service";
+
 class ContactService {
-    constructor() {
-        this.http = createHttp("/api/users");
-    }
+    constructor(baseUrl = "/api/users") {
+		this.api = createApiClient(baseUrl, true);
+	}
     async get(id) {
         return (await this.http.get(`/${id}`)).data;
     }

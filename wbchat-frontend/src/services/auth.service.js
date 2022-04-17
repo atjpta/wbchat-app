@@ -1,15 +1,19 @@
-import createHttp from "./http.service";
-class authService {
-    constructor() {
-        this.http = createHttp("/api/auth");
-    }
-    async create(data) {
-        return (await this.http.post(`/signup`, data)).data;
-    }
+import { createApiClient } from "./api.service";
 
-    async login(data) {
-        return (await this.http.post(`/signin`, data)).data;
-    }
-    
+class authService {
+	constructor(baseUrl = "/api/auth") {
+		this.api = createApiClient(baseUrl);
+	}
+
+	async login(user) {
+		return (
+			await this.api.post("/signin", user)).data;
+	}
+
+	async register(user) {
+		return (
+			await this.api.post("/signup", user)).data;
+	}
 }
+
 export default new authService();

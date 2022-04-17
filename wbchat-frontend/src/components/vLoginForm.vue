@@ -8,7 +8,7 @@
             <n-alert :title=error type="error" closable>
             </n-alert>
     </div>
-    <Form @submit="login"
+    <Form @submit="handleLogin"
         :validation-schema="FormSchema"
         class="flex justify-center my-20 bg-gradient-to-l from-sky-100 to-sky-500/50 min-w-max max-w-xl rounded-3xl p-10 mx-auto text-lg"
     >
@@ -19,7 +19,6 @@
                 name="username"
                 type="text"
                 class="rounded-md bg-gray-800/10"
-                v-model="username"
             />
             <div class="text-red-900">
                 <ErrorMessage name="username" class="error-feedback" />
@@ -32,7 +31,6 @@
                 name="password"
                 type="password"
                 class="rounded-md bg-gray-800/10"
-                v-model="password"
             />
             <div class="text-red-900">
                 <ErrorMessage name="password" class="error-feedback" />
@@ -54,7 +52,8 @@
 <script>
 import * as Yup from "yup";
 import { Form, Field, ErrorMessage } from "vee-validate";
-import authService from "@/services/auth.service";
+import { mapActions } from "pinia";
+import { useAuthStore } from "@/stores/auth.store";
 export default {
     components: {
         Form,
@@ -62,20 +61,7 @@ export default {
         ErrorMessage,
     },
     
-    methods: {
-        async login(){
-            this.message = "";
-            this.error = "";
-            try{
-                this.user = await authService.login({username: this.username, password: this.password});
-                this.message = "Đăng nhập thành công";
-            }
-            catch(error){
-                console.log(error.message);
-                this.error = "Sai tài khoản hoặc mật khẩu";
-            }
-        }
-    },
+    
     data() {
         
         const FormSchema = Yup.object().shape({
@@ -90,15 +76,30 @@ export default {
                 .min(2, "mật phải ít nhất 8 ký tự."),
         });
         return {
-            // Chúng ta sẽ không muốn hiệu chỉnh props, nên tạo biến cục bộ
-            //  để liên kết với các input trên form
-            username: "",
-            password: "",
+           
             FormSchema,
             message: "",
             error: "",
-            user:{},
         };
+    },
+    methods: {
+        ...mapActions(useAuthStore, ["login"]),
+        async handleLogin(user) {
+			this.loading = true;
+			try {
+				await this.login(user);
+				const redirectPath = this.$route.query.redirect || {
+					name: "rooms",
+				};
+
+				this.$router.push(redirectPath);
+			} catch (error) {
+				console.log(error);
+
+				this.loading = false;
+				this.message = "Đã có lỗi xảy ra.";
+			}
+		},
     },
     
 };

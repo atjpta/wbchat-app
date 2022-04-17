@@ -1,6 +1,8 @@
 <template>
   <div>
-    đang là trang home
+    <p>
+    đang là trang home khi đã đăng nhập thành công
+    </p>
   </div>
 </template>
 

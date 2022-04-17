@@ -8,7 +8,7 @@
             <!-- giữa -->
             <div class="flex pl-28"> 
                 <div class="px-6 ">
-                   <router-link to="/">
+                   <router-link to="/rooms">
                         <button>
                             <i class="fa-solid fa-house"></i>
                             Trang chủ
@@ -16,7 +16,7 @@
                    </router-link>
                 </div>
                 <div class="px-6">
-                    <router-link to="/">
+                    <router-link to="/trang2">
                         <button>
                             <i class="fa-solid fa-circle-question"></i>
                             Giúp đỡ
@@ -33,7 +33,7 @@
                 </div>
             </div>
             <!-- bên phải -->
-            <div class="flex"> 
+            <div v-if="!currentUser" class="flex"> 
                 <div class="pr-3 border-r-2">
                     <router-link to="/login" class="bg-teal-500/50 rounded-lg p-2 shadow-md"><button>Đăng nhập</button></router-link>
                 </div>
@@ -42,14 +42,42 @@
                 </div>
             </div>
 
+            <div v-if="currentUser" class="flex"> 
+                <div class="pr-3 border-r-2">
+                    <router-link to="/profile" class="bg-teal-500/50 rounded-lg p-2 shadow-md"><button>{{ currentUser.name }}</button></router-link>
+                </div>
+                <div class="pl-3">
+                    <button @click.prevent="handleLogout" > Đăng xuất </button>
+                </div>
+            </div>
+
       </div>
   </div>
 </template>
 
 <script>
-export default {
 
-}
+import { mapState, mapActions } from "pinia";
+import { useAuthStore } from "@/stores/auth.store";
+
+export default {
+	computed: {
+		...mapState(useAuthStore, {
+			currentUser: "user",
+		}),
+	},
+	methods: {
+		...mapActions(useAuthStore, ["logout", "loadAuthState"]),
+
+		handleLogout() {
+			this.logout();
+			this.$router.push({ name: "login" });
+		},
+	},
+	created() {
+		this.loadAuthState();
+	},
+};
 </script>
 
 <style>

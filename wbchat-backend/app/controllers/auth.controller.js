@@ -1,4 +1,4 @@
-const config = require("../config/auth.config");
+const config = require("../config");
 const db = require("../models");
 const User = db.user;
 const Role = db.role;
@@ -79,7 +79,7 @@ exports.signin = (req, res) => {
           message: "Invalid Password!"
         });
       }
-      var token = jwt.sign({ id: user.id }, config.secret, {
+      var token = jwt.sign({ id: user.id }, config.jwt.secret, {
         expiresIn: 86400 // 24 hours
       });
       var authorities = [];
