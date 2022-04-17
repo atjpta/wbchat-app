@@ -37,12 +37,21 @@
             </div>
         </div>
 
-        <div class="flex justify-center pt-10">
+        <div v-show="!loading" class="flex justify-center pt-10">
             <button 
               class="bg-teal-500 rounded-lg p-2 shadow-md w-44 hover:scale-125 duration-300"
               >
                 Đăng nhập
               </button>
+        </div>
+
+        <div v-show="loading" class="flex justify-center pt-10">
+            <div 
+              class="bg-teal-500/50 rounded-lg p-2 shadow-md w-44 duration-300"
+              >
+                <i class="fa-solid fa-spinner animate-spin px-4"></i>
+                Đăng nhập
+              </div>
         </div>
     </div>
     </Form>
@@ -80,6 +89,7 @@ export default {
             FormSchema,
             message: "",
             error: "",
+            loading: false,
         };
     },
     methods: {
@@ -91,11 +101,10 @@ export default {
 				const redirectPath = this.$route.query.redirect || {
 					name: "rooms",
 				};
-
 				this.$router.push(redirectPath);
+                this.loading = false;
 			} catch (error) {
 				console.log(error);
-
 				this.loading = false;
 				this.message = "Đã có lỗi xảy ra.";
 			}

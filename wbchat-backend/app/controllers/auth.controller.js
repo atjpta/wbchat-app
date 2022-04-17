@@ -50,7 +50,7 @@ exports.signup = (req, res) => {
             res.status(500).send({ message: err });
             return;
           }
-          res.send({ message: "User was registered successfully!" });
+          res.send({ message: "Đăng kí tài khoản thành công!" });
         });
       });
     }

@@ -75,13 +75,21 @@
         </div>
 
 
-        <div class="flex justify-center pt-10">
+        <div v-show="!loading" class="flex justify-center pt-10">
             <button 
-              class="bg-teal-500 rounded-lg p-2 shadow-md w-44 hover:scale-125 duration-300"
+              class="disabled bg-teal-500 rounded-lg p-2 shadow-md w-44 hover:scale-125 duration-300"
               >
-                Đăng kí
+            Đăng kí
               </button>
 
+        </div>
+        <div v-show="loading" class="flex justify-center pt-10">
+            <div 
+              class="bg-teal-500/50 rounded-lg p-2 shadow-md w-44 duration-300"
+              >
+                <i class="fa-solid fa-spinner animate-spin px-4"></i>
+                Đăng kí
+              </div>
         </div>
     </div>
     </Form>
@@ -134,6 +142,7 @@ export default {
             userFormSchema,
             message: "",
             error:"",
+            loading: false,
         };
     },
     methods: {
@@ -145,15 +154,11 @@ export default {
 
 			try {
 				const data = await this.register(user);
-
 				this.message = data.message;
-				this.successful = true;
 				this.loading = false;
 			} catch (error) {
 				console.log(error);
-
-				this.message = "Đã có lỗi xảy ra.";
-				this.successful = false;
+                this.error = "đã có lỗi xảy ra!!!"
 				this.loading = false;
 			}
 		},
