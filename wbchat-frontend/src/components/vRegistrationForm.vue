@@ -9,6 +9,7 @@
             </n-alert>
     </div>
     <Form
+        v-if="!success"
         @submit="handleRegister"
         :validation-schema="userFormSchema"
         class="flex justify-center my-20 bg-gradient-to-l from-sky-100 to-sky-500/50 min-w-max max-w-xl rounded-3xl p-10 mx-auto text-lg"
@@ -101,7 +102,7 @@
 import * as Yup from "yup";
 import { Form, Field, ErrorMessage } from "vee-validate";
 import { mapActions } from "pinia";
-import { useAuthStore } from "@/stores/auth.store";
+import { useStore } from "@/stores/store";
 
 export default {
     components: {
@@ -143,12 +144,14 @@ export default {
             message: "",
             error:"",
             loading: false,
+            success: false,
         };
     },
     methods: {
-        ...mapActions(useAuthStore, ["register"]),
+        ...mapActions(useStore, ["register"]),
 		async handleRegister(user) {
 			this.message = "";
+            this.error = "";
 			this.successful = false;
 			this.loading = true;
 
@@ -156,6 +159,7 @@ export default {
 				const data = await this.register(user);
 				this.message = data.message;
 				this.loading = false;
+                this.success = true;
 			} catch (error) {
 				console.log(error);
                 this.error = "đã có lỗi xảy ra!!!"

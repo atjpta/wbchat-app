@@ -8,7 +8,7 @@
             <!-- giữa -->
             <div class="flex pl-28"> 
                 <div class="px-6 hover:text-teal-500 hover:scale-125 duration-300 ">
-                   <router-link to="/rooms">
+                   <router-link to="/chatroom">
                         <button>
                             <i class="fa-solid fa-house"></i>
                             Trang chủ
@@ -61,16 +61,16 @@
 <script>
 
 import { mapState, mapActions } from "pinia";
-import { useAuthStore } from "@/stores/auth.store";
+import { useStore } from "@/stores/store";
 
 export default {
 	computed: {
-		...mapState(useAuthStore, {
+		...mapState(useStore, {
 			currentUser: "user",
 		}),
 	},
 	methods: {
-		...mapActions(useAuthStore, ["logout", "loadAuthState"]),
+		...mapActions(useStore, ["logout", "loadAuthState"]),
 
 		handleLogout() {
 			this.logout();

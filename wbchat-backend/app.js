@@ -3,6 +3,8 @@ const cors = require("cors");
 const setup_Room_Routes = require("./app/routes/room_chat.routes");
 const setup_User_Routes = require("./app/routes/users.routes");
 const setup_Auth_Routes = require("./app/routes/auth.routes")
+const http = require('http');
+const { Server } = require("socket.io");
 
 
 const { BadRequestError, errorHandler } = require("./app/errors");
@@ -10,6 +12,14 @@ const { BadRequestError, errorHandler } = require("./app/errors");
 
 
 const app = express();
+const server = http.createServer(app);
+
+const io = new Server(server,{
+    cors:{
+      origin: "*",
+      methods:["GET", "POST"],
+    },
+  });
 
 app.use(cors());
 app.use(express.json());
@@ -28,6 +38,54 @@ setup_User_Routes(app);
 setup_Room_Routes(app);
 setup_Auth_Routes(app);
 
+// kiểm tra người dùng và cho phép kết nối
+io.use((socket, next) => {
+  const user = socket.handshake.auth;
+  if (!user) {
+    return next(new Error("không có quyền truy cập"));
+  }
+  socket.user = user;
+  next();
+});
+
+io.on("connection", (socket) => {
+  console.log("kết nối socket thành công");
+
+  // gửi tất cả người dùng cho các máy khác biết
+  const users = [];
+  for (let [id, socket] of io.of("/").sockets) {
+    users.push({
+      userID_io: id,
+      id_user: socket.user.id_user,
+      token: socket.user.token,
+      name: socket.user.name,
+    });
+  }
+  socket.emit("GetAllUser", users);
+
+
+  // kiểm tra khi có người mới kết nối vào
+  socket.broadcast.emit("user connected", {
+      userID_io: socket.id,
+      id_user: socket.user.id_user,
+      token: socket.user.token,
+      name: socket.user.name,
+  });
+
+  // gửi tin nhắn riêng
+  socket.on("private message", ({ content, to }) => {
+    socket.to(to).emit("private message", {
+      content,
+      from: socket.id,
+    });
+  });
+
+  //khi có người ngắt kết nối
+  socket.on("disconnect", () => {
+    socket.broadcast.emit("user disconnected", socket.id);
+  });
+
+});
 
 app.use((req, res, next) => {
     // Code ở đây sẽ chạy khi không có route được định nghĩa nào
@@ -45,4 +103,4 @@ app.use((error, req, res, next) => {
    errorHandler.hanleError(error, res);
 });
 
-module.exports = app;
+module.exports = server;

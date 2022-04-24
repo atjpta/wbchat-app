@@ -24,7 +24,7 @@ export default {
             <input
             type="text"
             class="rounded-lg p-2 shadow-md w-72"
-            placeholder="nhập phòng cần tìm"
+            placeholder="nhập tên cần tìm"
             :value="modelValue"
             @input="updateModelValue"
             @keyup.enter="submit"

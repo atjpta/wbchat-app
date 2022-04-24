@@ -62,7 +62,8 @@
 import * as Yup from "yup";
 import { Form, Field, ErrorMessage } from "vee-validate";
 import { mapActions } from "pinia";
-import { useAuthStore } from "@/stores/auth.store";
+import { useStore } from "@/stores/store";
+import socket from "../socket";
 export default {
     components: {
         Form,
@@ -93,13 +94,14 @@ export default {
         };
     },
     methods: {
-        ...mapActions(useAuthStore, ["login"]),
+        ...mapActions(useStore, ["login"]),
         async handleLogin(user) {
 			this.loading = true;
 			try {
 				await this.login(user);
+                
 				const redirectPath = this.$route.query.redirect || {
-					name: "rooms",
+					name: "chatroom",
 				};
 				this.$router.push(redirectPath);
                 this.loading = false;
@@ -110,6 +112,5 @@ export default {
 			}
 		},
     },
-    
 };
 </script>

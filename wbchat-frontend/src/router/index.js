@@ -1,13 +1,13 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import welcome from '../views/WelcomeView.vue'
-import { useAuthStore } from "@/stores/auth.store";
+import { useStore } from "@/stores/store";
 
 
 // khi đăng nhập sẽ chuyển sang trang rooms
 const redirectIfLoggedIn = (_to, _from) => {
-	if (useAuthStore().isUserLoggedIn) {
+	if (useStore().isUserLoggedIn) {
 		return {
-			name: "rooms",
+			name: "chatroom",
 		};
 	}
 };
@@ -33,9 +33,9 @@ const routes = [
 		beforeEnter: redirectIfLoggedIn,
   },
   {
-    path: '/rooms',
-    name: 'rooms',
-    component: () => import('@/views/RoomsView.vue'),
+    path: '/chatroom',
+    name: 'chatroom',
+    component: () => import('@/views/ChatRoomView.vue'),
     
   },
   {
@@ -60,7 +60,7 @@ const router = createRouter({
 // nếu vào trang private thì nó sẽ bắt đăng nhập, nếu đăng nhập thành công sẽ chuyển sang trang mà đang muốn vào
 router.beforeEach((to, _from) => {
 	const authRequired = !to.meta.publicPage;
-	const auth = useAuthStore();
+	const auth = useStore();
 
 	if (authRequired && !auth.isUserLoggedIn) {
 		const query = to.fullPath === "/" ? {} : { redirect: to.fullPath };

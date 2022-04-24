@@ -1,5 +1,5 @@
 import axios from "axios";
-import { useAuthStore } from "@/stores/auth.store";
+import { useStore } from "@/stores/store";
 import app from "@/main";
 
 const commonConfig = {
