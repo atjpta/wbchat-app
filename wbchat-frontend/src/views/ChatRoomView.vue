@@ -7,7 +7,6 @@
           <p class="text-center text-xl">tất cả</p>
         </div>
         <VListuser :users = "users" @select= "onSelectUser" />
-
       </div>
       <!-- noi dung chat -->
       <div class="col-span-6" >
@@ -32,21 +31,22 @@
 <script setup>
 
 
-import socket from "../socket"
 import {ref, onMounted, onUnmounted} from "vue"
 import VListuser from "@/components/vList_user.vue";
 import VMsgPanel from "@/components/vMsgPanel.vue";
-
+import { useStore } from "@/stores/store";
 const users = ref([]);
 const selectedUser = ref();
+
+const Store = useStore();
 
 function onMessage(content){
   console.log(content);
   if(content){
     if (selectedUser.value) {
-      socket.emit("private message", {
+      Store.socket.emit("private message", {
         content,
-        to: selectedUser.value.userID_io,
+        to: selectedUser.value.userID,
       });
       selectedUser.value.messages.push({
         content,
@@ -60,13 +60,32 @@ function onMessage(content){
 function onSelectUser(user) {
       selectedUser.value = user;
       user.hasNewMessages = false;
+      console.log(user);
 }
 
 
 onMounted(() => {
+  const sessionID = localStorage.getItem("sessionID");
 
+  if (sessionID) {
+      Store.socket.auth = { 
+        user: Store.user,
+        sessionID: sessionID,
+      };
+      Store.socket.connect();
+    }
+  
+    Store.socket.on("session", ({ sessionID, userID }) => {
+      // attach the session ID to the next reconnection attempts
+      Store.socket.auth = { sessionID };
+      // store it in the localStorage
+      localStorage.setItem("sessionID", sessionID);
+      // save the ID of the user
+      Store.socket.userID = userID;
+    });
+     
   // kiểm tra xem bản thân có kết nối chưa
-  socket.on("connect", () =>{
+  Store.socket.on("connect", () =>{
     users.value.forEach((user) => {
       if(user.self){
         user.connected = false;
@@ -75,7 +94,7 @@ onMounted(() => {
   });
 
   //khi ngắt kết nối
-  socket.on("disconnect", () => {
+  Store.socket.on("disconnect", () => {
     users.value.forEach((user) => {
       if (user.self) {
         user.connected = false;
@@ -84,14 +103,22 @@ onMounted(() => {
   });
 
   // lấy tất cả users
-  socket.on("GetAllUser", (data) => {
+  Store.socket.on("GetAllUser", (data) => {
     data.forEach((user) => {
-      user.self = user.userID === socket.id;
-      initReactiveProperties(user);
-    });
+      for (let i = 0; i < users.value.length; i++) {
+          const existingUser = users.value[i];
+          if (existingUser.userID === user.userID) {
+            existingUser.connected = user.connected;
+            return;
+          }
+        }
+        user.self = user.userID === Store.socket.userID;
+        initReactiveProperties(user);
+        users.value.push(user);
+      });
 
     // put the current user first, and then sort by username
-    users.value = data.sort((a, b) => {
+    users.value.sort((a, b) => {
       if (a.self) return -1;
       if (b.self) return 1;
       if (a.name < b.name) return -1;
@@ -100,17 +127,25 @@ onMounted(() => {
   });
 
   // khi có người khác kết nối vào sẽ tự thêm vào ds
-  socket.on("user connected", (user) => {
-    initReactiveProperties(user);
-    users.value.push(user);
+  Store.socket.on("user connected", (data) => {
+    for (let i = 0; i < users.value.length; i++) {
+      const existingUser = users.value[i];
+      if (existingUser.userID === data.userID) {
+        existingUser.connected = true;
+        return;
+      }
+    }
+
+    initReactiveProperties(data);
+    users.value.push(data);
   });
 
     
   // khi có người khác ngắt kết nối
-  socket.on("user disconnected", (id) => {
+  Store.socket.on("user disconnected", (id) => {
     for (let i = 0; i < users.value.length; i++) {
       const user = users.value[i];
-      if (user.userID_io === id) {
+      if (user.userID === id) {
         user.connected = false;
         break;
       }
@@ -118,14 +153,15 @@ onMounted(() => {
   });
 
   // nhận nhắn tin
-  socket.on("private message", ({ content, from }) => {
-    for (let i = 0; i < users.value.length; i++) {
-      const user = users.value[i];
-      if (user.userID_io === from) {
-        user.messages.push({
-          content,
-          fromSelf: false,
-        });
+  Store.socket.on("private message", ({ content, from, to }) => {
+      for (let i = 0; i < users.value.length; i++) {
+        const user = users.value[i];
+        const fromSelf = Store.socket.userID === from;
+        if (user.userID === (fromSelf ? to : from)) {
+          user.messages.push({
+            content,
+            fromSelf,
+          });
         if (user !== selectedUser.value) {
           user.hasNewMessages = true;
         }
@@ -136,7 +172,6 @@ onMounted(() => {
 
 
   const initReactiveProperties = (user) => {
-      user.connected = true;
       user.messages = [];
       user.hasNewMessages = false;
     };
@@ -144,12 +179,12 @@ onMounted(() => {
 })
 
 onUnmounted(() =>{
-  socket.off("connect");
-  socket.off("disconnect");
-  socket.off("GetAllUser");
-  socket.off("user connected");
-  socket.off("user disconnected");
-  socket.off("private message");
+  Store.socket.off("connect");
+  Store.socket.off("disconnect");
+  Store.socket.off("GetAllUser");
+  Store.socket.off("user connected");
+  Store.socket.off("user disconnected");
+  Store.socket.off("private message");
 })
 </script>
 

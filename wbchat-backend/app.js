@@ -10,6 +10,12 @@ const { Server } = require("socket.io");
 const { BadRequestError, errorHandler } = require("./app/errors");
 
 
+const crypto = require("crypto");
+const randomId = () => crypto.randomBytes(8).toString("hex");
+
+const { InMemorySessionStore } = require("./sessionStore");
+const sessionStore = new InMemorySessionStore();
+
 
 const app = express();
 const server = http.createServer(app);
@@ -40,49 +46,94 @@ setup_Auth_Routes(app);
 
 // kiểm tra người dùng và cho phép kết nối
 io.use((socket, next) => {
-  const user = socket.handshake.auth;
+  console.log(socket.handshake.auth);
+
+  const sessionID = socket.handshake.auth.sessionID;
+  if (sessionID) {
+    const session = sessionStore.findSession(sessionID);
+    if (session) {
+      socket.sessionID = sessionID;
+      socket.userID = session.userID;
+      socket.user = session.user;
+      return next();
+    }
+  }
+
+
+  const user = socket.handshake.auth.user;
   if (!user) {
     return next(new Error("không có quyền truy cập"));
   }
+
+  socket.sessionID = randomId();
+  socket.userID = randomId();
   socket.user = user;
   next();
 });
 
 io.on("connection", (socket) => {
-  console.log("kết nối socket thành công");
+  console.log("kết nối socket thành công", socket.sessionID);
 
-  // gửi tất cả người dùng cho các máy khác biết
+
+  // lưu sessionID vào localStore
+  sessionStore.saveSession(socket.sessionID, {
+    userID: socket.userID,
+    user: socket.user,
+    connected: true,
+  });
+
+   // emit session details
+   socket.emit("session", {
+    sessionID: socket.sessionID,
+    userID: socket.userID,
+  });
+
+  // join the "userID" room
+  socket.join(socket.userID);
+
+  // gửi ds tất cả người dùng cho các máy khác biết
   const users = [];
-  for (let [id, socket] of io.of("/").sockets) {
+  sessionStore.findAllSessions().forEach((session) => {
     users.push({
-      userID_io: id,
-      id_user: socket.user.id_user,
-      token: socket.user.token,
-      name: socket.user.name,
+      userID: session.userID,
+      user: session.user,
+      connected: session.connected,
     });
-  }
+  });
   socket.emit("GetAllUser", users);
 
 
   // kiểm tra khi có người mới kết nối vào
   socket.broadcast.emit("user connected", {
-      userID_io: socket.id,
-      id_user: socket.user.id_user,
-      token: socket.user.token,
-      name: socket.user.name,
+    userID: socket.userID,
+    user: socket.user,
+    connected: true,
   });
 
   // gửi tin nhắn riêng
+  // forward the private message to the right recipient (and to other tabs of the sender)
   socket.on("private message", ({ content, to }) => {
-    socket.to(to).emit("private message", {
+    socket.to(to).to(socket.userID).emit("private message", {
       content,
-      from: socket.id,
+      from: socket.userID,
+      to,
     });
   });
 
   //khi có người ngắt kết nối
-  socket.on("disconnect", () => {
-    socket.broadcast.emit("user disconnected", socket.id);
+  socket.on("disconnect", async () => {
+    const matchingSockets = await io.in(socket.userID).allSockets();
+    const isDisconnected = matchingSockets.size === 0;
+    if (isDisconnected) {
+      // notify other users
+      socket.broadcast.emit("user disconnected", socket.userID);
+      // update the connection status of the session
+      sessionStore.saveSession(socket.sessionID, {
+        userID: socket.userID,
+        user: socket.user,
+        connected: false,
+      });
+    }
   });
 
 });

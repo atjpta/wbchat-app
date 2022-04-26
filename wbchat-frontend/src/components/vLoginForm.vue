@@ -94,7 +94,7 @@ export default {
         };
     },
     methods: {
-        ...mapActions(useStore, ["login"]),
+        ...mapActions(useStore, ["login",]),
         async handleLogin(user) {
 			this.loading = true;
 			try {

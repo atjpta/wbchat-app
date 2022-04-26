@@ -5,7 +5,7 @@
         <div :class="[!user.connected ? 'opacity-40': '']" class="flex">
             <img class="m-2 shrink-2 h-12 w-12 rounded-full" src="https://mondaycareer.com/wp-content/uploads/2020/11/anime-l%C3%A0-g%C3%AC-vampire.jpg" alt="" />
             <div class="ltr:ml-3 rtl:mr-3">
-                <p class="truncate w-32 text-xl font-medium">{{user.name}}</p>
+                <p class="truncate w-32 text-xl font-medium">{{user.user.name}}</p>
                 <p class="text-sm font-medium">{{user.connected ? "Online" : "Offline"}}</p>
             </div>  
         </div>

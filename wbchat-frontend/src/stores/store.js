@@ -5,6 +5,9 @@ export const useStore = defineStore("store", {
 	state() {
 		return {
 			user: null,
+			socket: socket,
+			socket_session: null,
+
 		};
 	},
 	getters: {
@@ -13,30 +16,40 @@ export const useStore = defineStore("store", {
 		},
 	},
 	actions: {
-		connectSocket(){
-			socket.auth = {
-				id_user : this.user.id,
-				name : this.user.name,
-				token : this.user.accessToken,
-			};
-			socket.connect();
-		},
+		// connectSocket(){
+		// 	socket.auth = {
+		// 		user: {
+		// 			id_user : this.user.id,
+		// 			name : this.user.name,
+		// 			token : this.user.accessToken,
+		// 		},
+		// 		sessionID: this.socket_session,
+		// 	};
+		// 	socket.connect();
+		// },
 		
-		
-		// GetAllUserOnl(){
-		// 	return socket.GetUsers();
+		// reConnectSocket(){
+		// 	socket.on("session", ({ sessionID, userID }) => {
+		// 		// attach the session ID to the next reconnection attempts
+		// 		socket.auth = { sessionID };
+		// 		// store it in the localStorage
+		// 		localStorage.setItem("sessionID", sessionID);
+		// 		// save the ID of the user
+		// 		socket.userID = userID;
+		// 	  });
 		// },
 
-		// CheckUserConnect(){
-		// 	socket.userJustConneted();
+		// loadSessionID(){
+		// 	this.socket_session = (localStorage.getItem("sessionID"))
 		// },
-
 		loadAuthState() {
 			this.user = JSON.parse(localStorage.getItem("user"));
 		},
 		logout() {
 			this.user = null;
 			localStorage.removeItem("user");
+			localStorage.removeItem("sessionID");
+			
 			socket.disconnect();
 		},
 		async login(user) {
@@ -50,12 +63,10 @@ export const useStore = defineStore("store", {
 			this.user = response;
 
 			localStorage.setItem("user", JSON.stringify(response));
-			socket.auth = {
-				id_user : this.user.id,
-				name : this.user.name,
-				token : this.user.accessToken,
+			this.socket.auth = {
+				user : this.user,
 			};
-			socket.connect();
+			this.socket.connect();
 			return response;
 		},
 		register(user) {
