@@ -1,5 +1,6 @@
 <template>
-  <div class=" mt-2 ">
+  <div class=" mt-2  ">
+    
     <!-- phần header -->
     <div class="group flex items-center justify-between rounded-xl bg-gradient-to-l from-sky-500/10 to-teal-500">
         <div :class="[!user.connected ? 'opacity-40': '']" class="flex">
@@ -15,24 +16,23 @@
     </div>
 
     <!-- phần nội dung chat -->
-    <div class=" min-h-[585px] bg-gradient-to-r from-sky-500/30 to-sky-50/70">
-
-    <ul>
-      <li
-        v-for="(message, index) in user.messages"
-        :key="index"
-      >
-        <div v-if="displaySender(message, index)">
-              <div :class="[who(message) ? 'flex justify-end': 'flex']">
-                    <div class="bg-red-50/50 rounded-xl p-2 mx-4 mt-2 order-last">
-                        {{message.content}}
-                    </div>
-              </div>
-        </div>
-        
-        
-      </li>
-    </ul>
+    <div id="chat" class=" overflow-auto max-h-[585px] min-h-[585px] bg-gradient-to-r from-sky-500 to-sky-50/70">
+      <ul class="">
+        <li
+          v-for="(message, index) in user.messages"
+          :key="index"
+        >
+          <div v-if="displaySender(message, index)">
+                <div :class="[message.fromSelf ? 'flex justify-end': 'flex']">
+                      <div class="bg-red-50/50 rounded-xl p-2 mx-4 mt-2 order-last">
+                          {{message.content}}
+                      </div>
+                </div>
+          </div>
+          
+          
+        </li>
+      </ul>
 
     </div>
 
@@ -53,15 +53,12 @@
 </template>
 
 <script setup>
-import {ref} from 'vue';
+import {onMounted, onUpdated, ref} from 'vue';
 
 defineProps({
   user: {},
 })
 
-function who(message){
-    return message.fromSelf ? true : false
-}
 const input = ref();
 
 const emit = defineEmits(['input'])
@@ -74,6 +71,25 @@ function sendInput(){
 function displaySender(message) {
       return typeof(message.content) === typeof('string');
     }
+
+function bot(){
+  var container = document.getElementById("chat");
+      container.scrollTop = container.scrollHeight;
+
+}
+
+
+onMounted(() => {
+  var container = document.getElementById("chat");
+  container.scrollTop = container.scrollHeight;
+
+})
+
+onUpdated(() => {
+  var container = document.getElementById("chat");
+  container.scrollTop = container.scrollHeight;
+
+})
 </script>
 
 <style>

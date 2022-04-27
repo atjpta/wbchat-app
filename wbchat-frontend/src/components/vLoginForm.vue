@@ -108,7 +108,7 @@ export default {
 			} catch (error) {
 				console.log(error);
 				this.loading = false;
-				this.message = "Đã có lỗi xảy ra.";
+				this.error = "Đã có lỗi xảy ra.";
 			}
 		},
     },

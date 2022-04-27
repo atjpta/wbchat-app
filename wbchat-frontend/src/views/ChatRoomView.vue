@@ -9,7 +9,7 @@
         <VListuser :users = "users" @select= "onSelectUser" />
       </div>
       <!-- noi dung chat -->
-      <div class="col-span-6" >
+      <div class="col-span-6 "  >
         <VMsgPanel 
           v-if = "selectedUser"
           :user = "selectedUser"
@@ -60,7 +60,6 @@ function onMessage(content){
 function onSelectUser(user) {
       selectedUser.value = user;
       user.hasNewMessages = false;
-      console.log(user);
 }
 
 
@@ -104,18 +103,25 @@ onMounted(() => {
 
   // lấy tất cả users
   Store.socket.on("GetAllUser", (data) => {
+    users.value = data;
     data.forEach((user) => {
+      user.messages.forEach((message) => {
+          message.fromSelf = message.from === Store.socket.userID;
+      });
+      user.self = user.userID === Store.socket.userID;
+
       for (let i = 0; i < users.value.length; i++) {
           const existingUser = users.value[i];
           if (existingUser.userID === user.userID) {
             existingUser.connected = user.connected;
+            existingUser.messages = user.messages;
             return;
           }
         }
-        user.self = user.userID === Store.socket.userID;
-        initReactiveProperties(user);
-        users.value.push(user);
-      });
+        // initReactiveProperties(user);
+        // users.value.push(user);
+    });
+
 
     // put the current user first, and then sort by username
     users.value.sort((a, b) => {
@@ -124,6 +130,9 @@ onMounted(() => {
       if (a.name < b.name) return -1;
       return a.name > b.name ? 1 : 0;
     });
+
+      console.log(users.value);
+
   });
 
   // khi có người khác kết nối vào sẽ tự thêm vào ds

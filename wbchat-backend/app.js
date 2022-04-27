@@ -16,6 +16,8 @@ const randomId = () => crypto.randomBytes(8).toString("hex");
 const { InMemorySessionStore } = require("./sessionStore");
 const sessionStore = new InMemorySessionStore();
 
+const { InMemoryMessageStore } = require("./messageStore");
+const messageStore = new InMemoryMessageStore();
 
 const app = express();
 const server = http.createServer(app);
@@ -46,8 +48,6 @@ setup_Auth_Routes(app);
 
 // kiểm tra người dùng và cho phép kết nối
 io.use((socket, next) => {
-  console.log(socket.handshake.auth);
-
   const sessionID = socket.handshake.auth.sessionID;
   if (sessionID) {
     const session = sessionStore.findSession(sessionID);
@@ -72,7 +72,7 @@ io.use((socket, next) => {
 });
 
 io.on("connection", (socket) => {
-  console.log("kết nối socket thành công", socket.sessionID);
+  console.log("kết nối socket thành công", socket.sessionID, socket.userID);
 
 
   // lưu sessionID vào localStore
@@ -93,11 +93,26 @@ io.on("connection", (socket) => {
 
   // gửi ds tất cả người dùng cho các máy khác biết
   const users = [];
+
+  // lấy tin nhắn dc lưu trong store ra
+  const messagesPerUser = new Map();
+  messageStore.findMessagesForUser(socket.userID).forEach((message) => {
+    const { from, to } = message;
+    const otherUser = socket.userID === from ? to : from;
+    console.log(otherUser);
+    if (messagesPerUser.has(otherUser)) {
+      messagesPerUser.get(otherUser).push(message);
+    } else {
+      messagesPerUser.set(otherUser, [message]);
+    }
+  });
+
   sessionStore.findAllSessions().forEach((session) => {
     users.push({
       userID: session.userID,
       user: session.user,
       connected: session.connected,
+      messages: messagesPerUser.get(session.userID) || [],
     });
   });
   socket.emit("GetAllUser", users);
@@ -108,16 +123,19 @@ io.on("connection", (socket) => {
     userID: socket.userID,
     user: socket.user,
     connected: true,
+    messages: [],
   });
 
   // gửi tin nhắn riêng
   // forward the private message to the right recipient (and to other tabs of the sender)
   socket.on("private message", ({ content, to }) => {
-    socket.to(to).to(socket.userID).emit("private message", {
+    const message = {
       content,
       from: socket.userID,
       to,
-    });
+    };
+    socket.to(to).to(socket.userID).emit("private message", message);
+    messageStore.saveMessage(message);
   });
 
   //khi có người ngắt kết nối

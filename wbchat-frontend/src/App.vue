@@ -2,7 +2,6 @@
 import { RouterLink, RouterView } from 'vue-router'
 import Vheader from '@/components/vheader.vue';
 import VInputSearch from '@/components/vInputSearch.vue';
-import Test2 from './components/test2.vue';
 
 </script>
 
@@ -11,8 +10,6 @@ import Test2 from './components/test2.vue';
    <Vheader />
    <VInputSearch />
 
-   <!-- <Test /> -->
-   <Test2 />
    <router-view />   
   </div>
 </template>
