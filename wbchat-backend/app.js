@@ -2,6 +2,8 @@ const express = require("express");
 const cors = require("cors");
 const setup_User_Routes = require("./app/routes/users.routes");
 const setup_Auth_Routes = require("./app/routes/auth.routes")
+const setup_Message_Routes = require("./app/routes/messages.routes")
+
 const http = require('http');
 const { Server } = require("socket.io");
 
@@ -43,6 +45,7 @@ app.get("/", (req, res) => {
 
 setup_User_Routes(app);
 setup_Auth_Routes(app);
+setup_Message_Routes(app);
 
 // kiểm tra người dùng và cho phép kết nối
 io.use((socket, next) => {

@@ -21,14 +21,9 @@ exports.moderatorBoard = (req, res) => {
 
 
 exports.findAll = async (req, res, next) => {
-    const condition = {};
-    const {name} = req.query;
-    if(name) {
-        condition.name = {$regex: new RegExp(name), $options: "i"};
-    }
 
     try{
-        const document = await user.find(condition);
+        const document = await user.find().sort({name : 1});
         return res.send(document);
     }
     catch(error) {
