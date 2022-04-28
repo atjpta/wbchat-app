@@ -1,6 +1,5 @@
 const express = require("express");
 const cors = require("cors");
-const setup_Room_Routes = require("./app/routes/room_chat.routes");
 const setup_User_Routes = require("./app/routes/users.routes");
 const setup_Auth_Routes = require("./app/routes/auth.routes")
 const http = require('http');
@@ -43,7 +42,6 @@ app.get("/", (req, res) => {
 });
 
 setup_User_Routes(app);
-setup_Room_Routes(app);
 setup_Auth_Routes(app);
 
 // kiểm tra người dùng và cho phép kết nối

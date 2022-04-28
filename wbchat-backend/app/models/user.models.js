@@ -14,6 +14,9 @@ const schema = mongoose.Schema(
         password: String,
         name: String,
         introduce: String,
+        socketID: String,
+        sessionID: String,
+
         avatar:
         {
             data: Buffer,

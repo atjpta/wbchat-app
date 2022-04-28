@@ -5,6 +5,7 @@ const db = {};
 
 db.user = require("./user.models");
 db.role = require("./role.models");
+db.message = require("./message.models")
 
 db.ROLES = ["user", "admin", "moderator"];
 

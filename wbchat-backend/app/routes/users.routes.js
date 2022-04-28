@@ -6,13 +6,14 @@ module.exports = (app) => {
     const router_user = express.Router();
 
     router_user.route("/")
-        .get(users.findAll_user)
-        .post(users.create_user);
+        .get([authJwt.verifyToken], users.findAll)
+        .delete([authJwt.verifyToken, authJwt.isModerator], users.deleteAll)
+
 
     router_user.route("/:id")
-        .get(users.findOne_user)
-        .put(users.update_user);
-
+        .get([authJwt.verifyToken], users.findOne)
+        .put([authJwt.verifyToken], users.update)
+        .delete([authJwt.verifyToken, authJwt.isModerator], users.delete)
 
     router_user.route("/test/all")
         .get(users.allAccess); 

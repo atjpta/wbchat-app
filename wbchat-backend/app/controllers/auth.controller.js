@@ -5,6 +5,10 @@ const Role = db.role;
 var jwt = require("jsonwebtoken");
 var bcrypt = require("bcryptjs");
 
+const crypto = require("crypto");
+const randomId = () => crypto.randomBytes(8).toString("hex");
+
+
 
 exports.signup = (req, res) => {
   const user = new User({
@@ -12,6 +16,8 @@ exports.signup = (req, res) => {
     email: req.body.email,
     name: req.body.name,
     password: bcrypt.hashSync(req.body.password, 8),
+    socketID: randomId(),
+    sessionID: randomId(),
   });
   user.save((err, user) => {
     if (err) {
@@ -92,6 +98,8 @@ exports.signin = (req, res) => {
         name: user.name,
         roles: authorities,
         accessToken: token,
+        socketID: user.socketID,
+        sessionID: user.sessionID,
       });
     });
 };
