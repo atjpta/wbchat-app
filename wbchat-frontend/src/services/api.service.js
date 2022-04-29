@@ -17,7 +17,7 @@ export const createApiClient = (baseURL, withAuthToken = false) => {
 
 	if (withAuthToken) {
 		api.interceptors.request.use((config) => {
-			const auth = useAuthStore();
+			const auth = useStore();
 
 			const user = auth.user;
 			if (user && user.accessToken) {

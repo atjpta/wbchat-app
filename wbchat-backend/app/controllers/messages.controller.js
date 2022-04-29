@@ -1,52 +1,42 @@
-const mongoose = require("mongoose");
 const db = require("../models");
-const Message = db.message;
-const {BadRequestError} = require("../errors");
-const { message } = require("../models");
+const Messages = db.message;
 
 
-exports.create = async (req, res, next) => {
-    if(!req.body.content) {
-        return next(new BadRequestError(400, "tin nhắn không được để trống"));
-    }
+exports.getMessages = async (req, res, next) => {
+  try {
+    const { from, to } = req.body;
 
+    const messages = await Messages.find({
+      users: {
+        $all: [from, to],
+      },
+    }).sort({ updatedAt: 1 });
 
-    const message = new Message ({
-        content: req.body.content,
-        to: req.body.to,
-        from: req.body.from,
-    })
-
-    try {
-        const document = await message.save();
-        return res.send(document);
-    }
-    catch (error) {
-        return next (
-            new BadRequestError (
-                500,
-                "có lỗi khi thêm message vào csdl"
-            )
-        );
-    }
+    const projectedMessages = messages.map((msg) => {
+      return {
+        fromSelf: msg.sender.toString() === from,
+        message: msg.message.text,
+      };
+    });
+    res.json(projectedMessages);
+  } catch (ex) {
+    next(ex);
+  }
 };
 
-exports.findMessagesForUser = async (req , res, next) => {
-    const {id} = req.params;
-   
-    try {
-        const document = await message.find({
-            $or: [{to: id}, {from: id}]});
-        return res.send(document);
-    }
-    catch (error) {
-        return next (
-            new BadRequestError (
-                500,
-                "có lỗi khi lấy message"
-            )
-        );
-    }
-}
+exports.addMessage = async (req, res, next) => {
+  try {
+    const { from, to, message } = req.body;
+    const data = await Messages.create({
+      message: { text: message },
+      users: [from, to],
+      sender: from,
+    });
 
-
+    if (data) return res.json({ msg: "Message added successfully." });
+    else return res.json({ msg: "Failed to add message to the database" });
+  } catch (ex) {
+    console.log("lỗi 500 nè ");
+    next(ex);
+  }
+};

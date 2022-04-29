@@ -20,18 +20,22 @@ exports.moderatorBoard = (req, res) => {
 };
 
 
-exports.findAll = async (req, res, next) => {
-
-    try{
-        const document = await user.find().sort({name : 1});
-        return res.send(document);
+exports.getAllUsers = async (req, res, next) => {
+    try {
+      const users = await user.find({ _id: { $ne: req.params.id } }).select([
+        "name",
+        "email",
+        "username",
+        "roles",
+        "_id",
+        "socketID",
+      ]);
+      return res.json(users);
+    } catch (ex) {
+      next(ex);
     }
-    catch(error) {
-        return next(
-            new BadRequestError(500, "lỗi lấy danh sách user"),
-        )
-    }
-}
+  };
+  
 
 exports.findOne = async (req, res, next) => {
     const {id} = req.params;

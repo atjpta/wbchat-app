@@ -1,55 +1,97 @@
 import { defineStore } from "pinia";
 import socket from "../socket";
 import AuthService from "@/services/auth.service";
+import userService from "../services/user.service";
+import messageService from "../services/message.Service";
 export const useStore = defineStore("store", {
 	state() {
 		return {
 			user: null,
 			socket: socket,
-			socket_session: null,
-
+			users: null,
+			selectUser: null,
+			msg: null,
+			setMessages: [],
+			setArrivalMessage: [],
 		};
 	},
 	getters: {
 		isUserLoggedIn(state) {
 			return !!state.user && !!state.user.accessToken;
 		},
+		getusers(state){
+			return state.users;
+		},
 	},
 	actions: {
-		// connectSocket(){
-		// 	socket.auth = {
-		// 		user: {
-		// 			id_user : this.user.id,
-		// 			name : this.user.name,
-		// 			token : this.user.accessToken,
-		// 		},
-		// 		sessionID: this.socket_session,
-		// 	};
-		// 	socket.connect();
-		// },
-		
-		// reConnectSocket(){
-		// 	socket.on("session", ({ sessionID, userID }) => {
-		// 		// attach the session ID to the next reconnection attempts
-		// 		socket.auth = { sessionID };
-		// 		// store it in the localStorage
-		// 		localStorage.setItem("sessionID", sessionID);
-		// 		// save the ID of the user
-		// 		socket.userID = userID;
-		// 	  });
-		// },
 
-		// loadSessionID(){
-		// 	this.socket_session = (localStorage.getItem("sessionID"))
-		// },
+		async recieveMessage(){
+			if(this.selectUser){
+			const response = await (messageService.get({
+				from: this.user.id,
+				to: this.selectUser.id,
+			  }));
+			  console.log(response);
+			  this.setMessages = response ;
+			}
+		},
+
+		socketRecieveMessage(){
+			socket.on("msg-recieve", (msg) => {
+				console.log(msg);
+				this.setArrivalMessage = ({ fromSelf: false, message: msg });
+				// const msgss =[...this.setMessages];
+				this.setMessages.push({fromSelf: false, message: msg});;
+			});
+			// this.setArrivalMessage && this.setMessages((prev) => [...prev, arrivalMessage]);
+			
+		},
+
+		async sendMessage(){
+			if(this.msg){
+				await (messageService.add({
+					from: this.user.id,
+					to: this.selectUser.id,
+					message: this.msg,
+				}));
+
+				socket.emit("send-msg", {
+					to: this.selectUser.id,
+					from: this.user.id,
+					toSocketID: this.selectUser.socketID,
+					fromSocketID: this.user.socketID,
+					message: this.msg,
+				});
+			}
+			const msgs =[...this.setMessages];
+			msgs.push({fromSelf: true, message: this.msg});
+			this.setMessages = msgs;
+
+			
+		},
+
+
+		socketConnet(){
+			socket.auth = {
+				socketID: this.user.socketID,
+				user: this.user
+			}
+			socket.connect();
+		},
+		
+
+
+		async getAllUser(){
+			this.users = (await userService.getAllUser()); 
+		},
+
+
 		loadAuthState() {
 			this.user = JSON.parse(localStorage.getItem("user"));
 		},
 		logout() {
 			this.user = null;
 			localStorage.removeItem("user");
-			localStorage.removeItem("sessionID");
-			
 			socket.disconnect();
 		},
 		async login(user) {
@@ -59,14 +101,15 @@ export const useStore = defineStore("store", {
 				this.logout();
 				throw new Error("Whoops, no access token found!");
 			}
-
 			this.user = response;
-
 			localStorage.setItem("user", JSON.stringify(response));
-			this.socket.auth = {
-				user : this.user,
-			};
-			this.socket.connect();
+			socket.emit("add-user", this.user.id)
+			
+			socket.auth = {
+				socketID: this.user.socketID,
+				user: this.user
+			}
+			socket.connect();
 			return response;
 		},
 		register(user) {

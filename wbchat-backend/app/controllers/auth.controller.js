@@ -17,7 +17,6 @@ exports.signup = (req, res) => {
     name: req.body.name,
     password: bcrypt.hashSync(req.body.password, 8),
     socketID: randomId(),
-    sessionID: randomId(),
   });
   user.save((err, user) => {
     if (err) {
@@ -99,7 +98,6 @@ exports.signin = (req, res) => {
         roles: authorities,
         accessToken: token,
         socketID: user.socketID,
-        sessionID: user.sessionID,
       });
     });
 };

@@ -15,13 +15,6 @@ const schema = mongoose.Schema(
         name: String,
         introduce: String,
         socketID: String,
-        sessionID: String,
-
-        avatar:
-        {
-            data: Buffer,
-            contentType: String
-        },
         roles: [
             {
               type: mongoose.Schema.Types.ObjectId,
