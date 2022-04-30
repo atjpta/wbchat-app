@@ -13,15 +13,27 @@ export const useStore = defineStore("store", {
 			msg: null,
 			setMessages: [],
 			onls: [],
+			keyFind: '',
+			findUsers: [],
 		};
 	},
 	getters: {
 		isUserLoggedIn(state) {
 			return !!state.user && !!state.user.accessToken;
 		},
+
+		find(State){
+			if(State.keyFind.length > 0)
+			{
+				State.findUsers = State.users.filter(user => user.nameFind.indexOf(State.keyFind) > -1);
+			}
+			else State.findUsers = State.users;
+		},
 		onl(State){
 			if(State.users){
 				State.users.forEach(user => {
+					// chuyển chuổi thành chữa thường để dễ tìm kiếm 
+					user.nameFind = user.name.toLowerCase();
 					if(State.onls.find((id) => id == user.id )){
 						user.onl = true;
 					}
@@ -31,7 +43,7 @@ export const useStore = defineStore("store", {
 		},
 		sortUsers(State){
 			if(State.users){
-				State.users.sort((a, b) => {
+				State.users.sort((a) => {
 					if (a.onl)
 						return -1;
 					if (!a.onl)

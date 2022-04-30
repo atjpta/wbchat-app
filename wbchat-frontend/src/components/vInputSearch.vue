@@ -1,22 +1,3 @@
-<script>
-export default {
-  props: {
-    modelValue: {
-      type: String,
-      default: "",
-    },
-  },
-  emits: ["submit", "update:modelValue"],
-  methods: {
-    updateModelValue(e) {
-      this.$emit("update:modelValue", e.target.value);
-    },
-    submit() {
-      this.$emit("submit");
-    },
-  },
-};
-</script>
 
 <template>
     <div class="flex justify-center mt-10 ">
@@ -25,8 +6,8 @@ export default {
             type="text"
             class="rounded-lg p-2 shadow-md w-72"
             placeholder="nhập tên cần tìm"
-            :value="modelValue"
-            @input="updateModelValue"
+            v-model="Store.keyFind"
+            @input="Store.find"
             @keyup.enter="submit"
             />
         </div>
@@ -38,3 +19,12 @@ export default {
         </div>
     </div>
 </template>
+
+
+
+<script setup>
+import { useStore } from "@/stores/store";
+
+const Store = useStore();
+
+</script>

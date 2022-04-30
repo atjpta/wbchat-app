@@ -1,7 +1,7 @@
 <template>
 <div>
   <div v-if="user">
-    <div class=" mt-2 bg-gradient-to-r from-sky-500 to-sky-50/70 shadow-2xl ">
+    <div class=" mt-2 bg-gradient-to-r from-sky-500 to-sky-50/70 ">
       
       <!-- phần header -->
       <div class="group flex items-center justify-between rounded-xl bg-gradient-to-l from-sky-500/10 to-teal-500">
@@ -55,12 +55,12 @@
     </div>
   </div>
   <!-- khi chưa có chọn user để nói chuyện -->
-  <div v-if="!user" class="max-h-[585px] min-h-[585px] flex justify-between mt-28 shadow-2xl">
+  <div v-if="!user" class="max-h-[585px] min-h-[585px] flex justify-between mt-28 ">
     <div></div>
     <div class="">
 
       <div class="mx-auto">
-        <img class = "w-96 rounded-2xl" src = "http://www.anime-evo.net/wp-content/uploads/2016/07/ReLIFE_04_8.jpg">
+        <img class = "w-96 rounded-2xl" src = "https://animesher.com/orig/1/155/1550/15503/animesher.com_funny-manga-kazumi-oga-1550361.gif">
       </div>
 
       <div class="text-2xl text-center mt-5">

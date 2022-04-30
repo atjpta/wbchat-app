@@ -6,7 +6,7 @@
         <div class="bg-purple-600/50 rounded-md my-2">
           <p class="text-center text-xl">tất cả</p>
         </div>
-        <VListuser :users = "Store.users" @select= "onSelectUser" />
+        <VListuser :users = "Store.findUsers" @select= "onSelectUser" />
       </div>
       <!-- noi dung chat -->
       <div class="col-span-9 "  >
