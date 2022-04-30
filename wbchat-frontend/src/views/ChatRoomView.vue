@@ -1,5 +1,8 @@
 <template>
   <div class="max-w-3xl min-w-max mx-auto my-10">
+    <button @click="Store.test()">
+      test
+    </button>
     <div class="grid grid-cols-12">
       <!-- ds user -->
       <div class="col-span-3">
@@ -30,7 +33,7 @@
 <script setup>
 
 
-import {ref, onMounted, onUnmounted, onActivated} from "vue"
+import {ref, onMounted, onUnmounted, onUpdated} from "vue"
 import VListuser from "@/components/vList_user.vue";
 import VMsgPanel from "@/components/vMsgPanel.vue";
 import { useStore } from "@/stores/store";
@@ -63,12 +66,17 @@ function onSelectUser(user) {
       Store.selectUser = selectedUser.value
 }
 
-onActivated(() => {
-  
-})
-
 onMounted(() => {
+  Store.getAllUser();
+  Store.socketConnet();
+  Store.recieveMessage();
   Store.socketRecieveMessage();
+  Store.socketOnl();
+  Store.userOff();
+  Store.userOnl();
+  
+
+  
   // const sessionID = localStorage.getItem("sessionID");
 
   // if (sessionID) {
@@ -193,7 +201,8 @@ onMounted(() => {
 })
 
 onUnmounted(() =>{
-    // Store.socketOff();
+		Store.socket.off("msg-recieve");
+
 })
 </script>
 

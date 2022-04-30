@@ -51,10 +51,26 @@ setup_Message_Routes(app);
 global.onlineUsers = new Map();
 io.on("connection", (socket) => {
   global.chatSocket = socket;
-  console.log(global.chatSocket);
-
   socket.on("add-user", (userId) => {
     onlineUsers.set(userId, socket.id);
+    //lấy tất cả người đang onl ra
+    const users = []
+    onlineUsers.forEach((value, key) => {
+        users.push(key)
+    });
+    socket.emit("userOnl", users);
+  });
+
+  // thông báo mọi người biết có người đang onl
+  socket.broadcast.emit("user connected", {
+    userID: socket.handshake.auth.user.id,
+  });
+  //thông báo mọi người khi có người off
+  socket.on("disconnect", () => {
+    socket.broadcast.emit("user disconnected", {
+      userID: socket.handshake.auth.user.id,
+    });
+    onlineUsers.delete(socket.handshake.auth.user.id);
   });
 
   socket.on("send-msg", (data) => {

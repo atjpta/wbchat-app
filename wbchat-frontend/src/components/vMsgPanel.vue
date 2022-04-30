@@ -3,11 +3,11 @@
     
     <!-- phần header -->
     <div class="group flex items-center justify-between rounded-xl bg-gradient-to-l from-sky-500/10 to-teal-500">
-        <div :class="[!user ? 'opacity-40': '']" class="flex">
+        <div :class="[!user.onl ? 'opacity-40': '']" class="flex">
             <img class="m-2 shrink-2 h-12 w-12 rounded-full" src="https://mondaycareer.com/wp-content/uploads/2020/11/anime-l%C3%A0-g%C3%AC-vampire.jpg" alt="" />
             <div class="ltr:ml-3 rtl:mr-3">
                 <p class="truncate w-32 text-xl font-medium">{{user.name}}</p>
-                <p class="text-sm font-medium">{{user ? "Online" : "Offline"}}</p>
+                <p class="text-sm font-medium">{{user.onl ? "Online" : "Offline"}}</p>
             </div>  
         </div>
       <div class="pr-10 scale-150">
@@ -51,7 +51,7 @@
 </template>
 
 <script setup>
-import {onMounted, onUpdated, ref} from 'vue';
+import {onMounted, onUpdated, onUnmounted, ref} from 'vue';
 import { useStore } from "@/stores/store";
 
 const Store = useStore();
@@ -80,6 +80,10 @@ onMounted(() => {
   container.scrollTop = container.scrollHeight;
 
 })
+
+onUnmounted(() => {
+	  Store.socket.off("send-msg");
+}),
 
 onUpdated(() => {
   var container = document.getElementById("chat");

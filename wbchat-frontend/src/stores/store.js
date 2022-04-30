@@ -12,12 +12,22 @@ export const useStore = defineStore("store", {
 			selectUser: null,
 			msg: null,
 			setMessages: [],
-			setArrivalMessage: [],
+			onls: [],
 		};
 	},
 	getters: {
 		isUserLoggedIn(state) {
 			return !!state.user && !!state.user.accessToken;
+		},
+		onl(State){
+			if(State.users){
+				State.users.forEach(user => {
+					if(State.onls.find((id) => id == user.id )){
+						user.onl = true;
+					}
+					else user.onl = false;
+				});
+			}
 		},
 	},
 	actions: {
@@ -37,10 +47,26 @@ export const useStore = defineStore("store", {
 				const msgs =[...this.setMessages];
 				msgs.push({fromSelf: false, message: msg});
 				this.setMessages = msgs;
-				console.log(msg);
 			});
 			
 		},
+
+		userOff(){
+			// khi có người thoát
+			this.socket.on("user disconnected", (id) => {
+				this.onls = this.onls.filter(onl => onl != id.userID);
+			});
+		},
+
+		userOnl(){
+			// khi có người kết nối tới
+			this.socket.on("user connected", (id) => {
+				this.onls.push(id.userID);
+			});
+		},
+
+		
+		  
 
 		async sendMessage(){
 			if(this.msg){
@@ -69,12 +95,13 @@ export const useStore = defineStore("store", {
 				user: this.user
 			}
 			socket.connect();
+			socket.emit("add-user", this.user.id)
 		},
-
-		// socketOff(){
-		// 	socket.off("send-msg");
-		// 	socket.off("msg-recieve");
-		// },
+		socketOnl(){
+			socket.on("userOnl", (onlineUsers) => {
+				this.onls = onlineUsers;
+			})
+		},
 		
 
 
@@ -90,6 +117,12 @@ export const useStore = defineStore("store", {
 			this.user = null;
 			localStorage.removeItem("user");
 			socket.disconnect();
+			this.user = null,
+			this.users = null,
+			this.selectUser = null,
+			this.msg = null,
+			this.setMessages = [],
+			this.onls = []
 		},
 		async login(user) {
 			const response = await AuthService.login(user);
@@ -100,12 +133,6 @@ export const useStore = defineStore("store", {
 			}
 			this.user = response;
 			localStorage.setItem("user", JSON.stringify(response));
-			socket.emit("add-user", this.user.id)
-			
-			socket.auth = {
-				user: this.user
-			}
-			socket.connect();
 			return response;
 		},
 		register(user) {

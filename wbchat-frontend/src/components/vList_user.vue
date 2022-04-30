@@ -7,12 +7,12 @@
     >
       <!-- 1 user  -->
       <div v-if="!self(user.id)">
-      <div :class="[chon(user.id) ? 'border-4 border-black rounded-lg':'']">
-        <div :class="[!user ? 'opacity-40': '']" class="cursor-pointer group flex items-center rounded-xl duration-300 hover:scale-125 hover:bg-gray-800/30 hover:text-blue-800 ">
+      <div :class="[chon(user.id) ? 'bg-purple-500/30 rounded-lg':'']">
+        <div :class="[!user.onl ? 'opacity-40 border-r-8': 'border-r-8 border-emerald-500']" class="cursor-pointer group flex items-center rounded-xl duration-300 hover:scale-125 hover:bg-gray-800/30 hover:text-blue-800 ">
           <img class="m-2 shrink-2 h-12 w-12 rounded-full" src="https://mondaycareer.com/wp-content/uploads/2020/11/anime-l%C3%A0-g%C3%AC-vampire.jpg" alt="" />
           <div class="ltr:ml-3 rtl:mr-3">
             <p class="truncate w-32 text-xl font-medium">{{user.name}}</p>
-            <p class="text-sm font-medium">{{user ? "Online" : "Offline"}}</p>
+            <p class="text-sm font-medium">{{user.onl ? "Online" : "Offline"}}</p>
           </div>  
         </div>
       </div>
@@ -67,11 +67,9 @@ defineProps({
 })
 
 onMounted(() => {
-  Store.getAllUser();
-  Store.socketConnet();
-  Store.recieveMessage();
-})
 
+  
+})
 
 </script>
 
