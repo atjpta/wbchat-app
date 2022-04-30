@@ -64,7 +64,14 @@ defineProps({
 })
 
 onMounted(() => {
-
+  Store.getAllUser();
+  Store.socketConnet();
+  Store.recieveMessage();
+  Store.socketRecieveMessage();
+  Store.socketOnl();
+  Store.userOff();
+  Store.userOnl();
+  Store.socketRefresh();
   
 })
 

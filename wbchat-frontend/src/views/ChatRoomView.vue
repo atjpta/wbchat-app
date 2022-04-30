@@ -37,19 +37,11 @@ const Store = useStore();
 
 function onSelectUser(user) {
       selectedUser.value = user;
-      user.hasNewMessages = false;
       Store.selectUser = selectedUser.value
 }
 
 onMounted(() => {
-  Store.getAllUser();
-  Store.socketConnet();
-  Store.recieveMessage();
-  Store.socketRecieveMessage();
-  Store.socketOnl();
-  Store.userOff();
-  Store.userOnl();
-  Store.socketRefresh();
+  
 })
 
 onUnmounted(() =>{

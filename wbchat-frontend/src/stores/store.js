@@ -79,6 +79,8 @@ export const useStore = defineStore("store", {
 			// khi có người thoát
 			this.socket.on("user disconnected", (id) => {
 				this.onls = this.onls.filter(onl => onl != id.userID);
+				this.onl;
+				this.sortUsers
 			});
 		},
 
@@ -86,6 +88,8 @@ export const useStore = defineStore("store", {
 			// khi có người kết nối tới
 			this.socket.on("user connected", (id) => {
 				this.onls.push(id.userID);
+				this.onl;
+				this.sortUsers
 			});
 		},
 
@@ -130,13 +134,17 @@ export const useStore = defineStore("store", {
 		socketOnl(){
 			socket.on("userOnl", (onlineUsers) => {
 				this.onls = onlineUsers;
+				
 			})
 		},
 		
 
 
 		async getAllUser(){
-			this.users = (await userService.getAllUser()); 
+			this.users = (await userService.getAllUser());
+			this.onl;
+			this.sortUsers;
+			this.find;
 		},
 
 
