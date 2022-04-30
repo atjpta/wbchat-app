@@ -20,4 +20,7 @@ export default defineConfig({
       },
     },
   },
+  publicPath: process.env.NODE_ENV === 'production'
+    ? '/demo_wbchat/' // Thay tên repository của các bạn vào đây nhé
+    : '/'
 });

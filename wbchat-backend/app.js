@@ -10,16 +10,6 @@ const { Server } = require("socket.io");
 
 const { BadRequestError, errorHandler } = require("./app/errors");
 
-
-const crypto = require("crypto");
-const randomId = () => crypto.randomBytes(8).toString("hex");
-
-const { InMemorySessionStore } = require("./sessionStore");
-const sessionStore = new InMemorySessionStore();
-
-const { InMemoryMessageStore } = require("./messageStore");
-const messageStore = new InMemoryMessageStore();
-
 const app = express();
 const server = http.createServer(app);
 
