@@ -1,4 +1,6 @@
 <template>
+<div>
+  <VInputSearch />
   <div class="min-w-max mx-3.5 my-10">
     <div class="grid grid-cols-12">
       <!-- ds user -->
@@ -17,6 +19,7 @@
      
     </div>
   </div>
+</div>
 </template>
 
 <script setup>
@@ -26,6 +29,7 @@ import {ref, onMounted, onUnmounted, onUpdated} from "vue"
 import VListuser from "@/components/vList_user.vue";
 import VMsgPanel from "@/components/vMsgPanel.vue";
 import { useStore } from "@/stores/store";
+import VInputSearch from "../components/vInputSearch.vue";
 
 const users = ref([]);
 const selectedUser = ref();
