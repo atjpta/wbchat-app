@@ -28,7 +28,7 @@
 <script setup>
 import { array } from "yup/lib/locale";
 import { useStore } from "@/stores/store";
-import {ref} from 'vue';
+import {ref, onMounted} from 'vue';
 const Store = useStore();
 
 const select = ref();
@@ -53,14 +53,23 @@ function click(user){
 }
 
 function self(id) {
-  if(id == Store.user.id)
+  if(Store.user){
+    if(id == Store.user.id)
     return true;
   else false
+  }
+  
 }
 
 
 defineProps({
   users: array,
+})
+
+onMounted(() => {
+  Store.getAllUser();
+  Store.socketConnet();
+  Store.recieveMessage();
 })
 
 

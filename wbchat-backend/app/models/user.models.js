@@ -14,7 +14,6 @@ const schema = mongoose.Schema(
         password: String,
         name: String,
         introduce: String,
-        socketID: String,
         roles: [
             {
               type: mongoose.Schema.Types.ObjectId,

@@ -30,7 +30,7 @@
 <script setup>
 
 
-import {ref, onMounted, onUnmounted} from "vue"
+import {ref, onMounted, onUnmounted, onActivated} from "vue"
 import VListuser from "@/components/vList_user.vue";
 import VMsgPanel from "@/components/vMsgPanel.vue";
 import { useStore } from "@/stores/store";
@@ -63,16 +63,12 @@ function onSelectUser(user) {
       Store.selectUser = selectedUser.value
 }
 
+onActivated(() => {
+  
+})
 
 onMounted(() => {
-
-  Store.getAllUser();
-  Store.recieveMessage();
   Store.socketRecieveMessage();
-  Store.socketConnet();
-  Store.socket.on("msg-recieve", (msg) => {
-				console.log(msg);
-  });
   // const sessionID = localStorage.getItem("sessionID");
 
   // if (sessionID) {
@@ -197,12 +193,7 @@ onMounted(() => {
 })
 
 onUnmounted(() =>{
-  // Store.socket.off("connect");
-  // Store.socket.off("disconnect");
-  // Store.socket.off("GetAllUser");
-  // Store.socket.off("user connected");
-  // Store.socket.off("user disconnected");
-  // Store.socket.off("private message");
+    // Store.socketOff();
 })
 </script>
 

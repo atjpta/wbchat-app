@@ -50,19 +50,20 @@ setup_Message_Routes(app);
 
 global.onlineUsers = new Map();
 io.on("connection", (socket) => {
-  console.log(socket.handshake.auth);
   global.chatSocket = socket;
+  console.log(global.chatSocket);
+
   socket.on("add-user", (userId) => {
     onlineUsers.set(userId, socket.id);
   });
 
   socket.on("send-msg", (data) => {
-    console.log(data.fromSocketID, data.message);
-      socket.to(data.fromSocketID).emit("msg-recieve", "vheruogv");
-    
+    const sendUserSocket = onlineUsers.get(data.to);
+    if (sendUserSocket) {
+      socket.to(sendUserSocket).emit("msg-recieve", data.message);
+    }
   });
 });
-
 
 
 app.use((req, res, next) => {

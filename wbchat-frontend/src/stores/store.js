@@ -19,9 +19,6 @@ export const useStore = defineStore("store", {
 		isUserLoggedIn(state) {
 			return !!state.user && !!state.user.accessToken;
 		},
-		getusers(state){
-			return state.users;
-		},
 	},
 	actions: {
 
@@ -31,19 +28,17 @@ export const useStore = defineStore("store", {
 				from: this.user.id,
 				to: this.selectUser.id,
 			  }));
-			  console.log(response);
 			  this.setMessages = response ;
 			}
 		},
 
 		socketRecieveMessage(){
 			socket.on("msg-recieve", (msg) => {
+				const msgs =[...this.setMessages];
+				msgs.push({fromSelf: false, message: msg});
+				this.setMessages = msgs;
 				console.log(msg);
-				this.setArrivalMessage = ({ fromSelf: false, message: msg });
-				// const msgss =[...this.setMessages];
-				this.setMessages.push({fromSelf: false, message: msg});;
 			});
-			// this.setArrivalMessage && this.setMessages((prev) => [...prev, arrivalMessage]);
 			
 		},
 
@@ -58,8 +53,6 @@ export const useStore = defineStore("store", {
 				socket.emit("send-msg", {
 					to: this.selectUser.id,
 					from: this.user.id,
-					toSocketID: this.selectUser.socketID,
-					fromSocketID: this.user.socketID,
 					message: this.msg,
 				});
 			}
@@ -73,11 +66,15 @@ export const useStore = defineStore("store", {
 
 		socketConnet(){
 			socket.auth = {
-				socketID: this.user.socketID,
 				user: this.user
 			}
 			socket.connect();
 		},
+
+		// socketOff(){
+		// 	socket.off("send-msg");
+		// 	socket.off("msg-recieve");
+		// },
 		
 
 
@@ -106,7 +103,6 @@ export const useStore = defineStore("store", {
 			socket.emit("add-user", this.user.id)
 			
 			socket.auth = {
-				socketID: this.user.socketID,
 				user: this.user
 			}
 			socket.connect();
