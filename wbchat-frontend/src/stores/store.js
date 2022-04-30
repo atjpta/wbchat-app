@@ -29,6 +29,18 @@ export const useStore = defineStore("store", {
 				});
 			}
 		},
+		sortUsers(State){
+			if(State.users){
+				State.users.sort((a, b) => {
+					if (a.onl)
+						return -1;
+					if (!a.onl)
+						return 1;
+					return 0;
+				});
+			}
+			
+		}
 	},
 	actions: {
 
@@ -89,6 +101,12 @@ export const useStore = defineStore("store", {
 			
 		},
 
+		socketRefresh(){
+			socket.on("refreshListUser", () => {
+				this.getAllUser();
+			})
+		},
+
 
 		socketConnet(){
 			socket.auth = {
@@ -136,6 +154,9 @@ export const useStore = defineStore("store", {
 			return response;
 		},
 		register(user) {
+			socket.connect();
+			socket.emit("userRegister")
+			socket.disconnect();
 			this.user = null;
 			return AuthService.register(user);
 		},

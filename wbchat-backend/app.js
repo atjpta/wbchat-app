@@ -51,6 +51,9 @@ setup_Message_Routes(app);
 global.onlineUsers = new Map();
 io.on("connection", (socket) => {
   global.chatSocket = socket;
+  socket.on("userRegister", () => {
+    socket.broadcast.emit("refreshListUser");
+  })
   socket.on("add-user", (userId) => {
     onlineUsers.set(userId, socket.id);
     //lấy tất cả người đang onl ra

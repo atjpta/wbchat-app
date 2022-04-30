@@ -49,7 +49,7 @@
                     <router-link to="/profile" class=""><button>{{ currentUser.name }}</button></router-link>
                 </div> 
                 <div class="border-r-2"></div>
-                <div class="px-3">
+                <div class="px-3 hover:text-teal-500 hover:scale-125 duration-300">
                     <button @click.prevent="handleLogout" > Đăng xuất </button>
                 </div>
             </div>
