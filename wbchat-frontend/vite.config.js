@@ -15,8 +15,7 @@ export default defineConfig({
     port: 8081,
     proxy: {
       "/api": {
-        // target: "http://localhost:8088/",
-        target: "https://api-wbchat.vercel.app/",
+        target: "http://localhost:8088/",
         changeOrigin: true,
       },
     },
