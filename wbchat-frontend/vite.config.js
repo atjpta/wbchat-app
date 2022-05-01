@@ -15,12 +15,14 @@ export default defineConfig({
     port: 8081,
     proxy: {
       "/api": {
-        target: "http://localhost:8088/",
+        // target: "http://localhost:8088/",
+        target: "https://api-wbchat.vercel.app/",
         changeOrigin: true,
       },
     },
   },
-  publicPath: process.env.NODE_ENV === 'production'
-    ? '/demo_wbchat/' // Thay tên repository của các bạn vào đây nhé
-    : '/'
+  build: {
+    chunkSizeWarningLimit: 1600,
+  },
+  base: process.env.NODE_ENV === 'production' ? '/demo_wbchat/' : '/',
 });

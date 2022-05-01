@@ -2,10 +2,12 @@
   "name": "wbchat-backend",
   "version": "1.0.0",
   "description": "real time app chat",
-  "main": "server.js",
+  "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "nodemon server.js"
+    "start": "node index.js",
+    "startt": "nodemon index.js"
+    
   },
   "author": "b1910027",
   "license": "ISC",
