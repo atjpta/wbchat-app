@@ -6,7 +6,7 @@
       <!-- phần header -->
       <div class="group flex items-center justify-between rounded-xl bg-gradient-to-l from-sky-500/10 to-teal-500">
           <div :class="[!user.onl ? 'opacity-40': '']" class="flex">
-              <img class="m-2 shrink-2 h-12 w-12 rounded-full" src="https://mondaycareer.com/wp-content/uploads/2020/11/anime-l%C3%A0-g%C3%AC-vampire.jpg" alt="" />
+              <img class="m-2 shrink-2 h-12 w-12 rounded-full" src="../../public/imgs/avatar.jpg" alt="" />
               <div class="ltr:ml-3 rtl:mr-3">
                   <p class="truncate w-32 text-xl font-medium">{{user.name}}</p>
                   <p class="text-sm font-medium">{{user.onl ? "Online" : "Offline"}}</p>
@@ -60,17 +60,15 @@
     <div class="">
 
       <div class="mx-auto">
-        <img class = "w-96 rounded-2xl" src = "https://animesher.com/orig/1/155/1550/15503/animesher.com_funny-manga-kazumi-oga-1550361.gif">
+        <img class = "w-96 rounded-2xl" src = "../../public/imgs/cuoi.gif">
       </div>
 
       <div class="text-2xl text-center mt-5">
         <p>
           Còn chờ gì nữa!!!!
-        </p>
-        <p>
+        <br>
           Hãy mau chọn người chat 
-        </p>
-        <p>
+        <br>
           Để cùng nhau trò chuyện :3
         </p>
       </div>

@@ -26,7 +26,7 @@
       </div>
       <!-- bên phải -->
       <div class="col-span-6">
-        <img class=" w-[850px] h-[450px]" src="https://scontent.fsgn7-1.fna.fbcdn.net/v/t1.15752-9/257596259_897892470855788_6265736314467085893_n.png?stp=dst-png_s2048x2048&_nc_cat=108&ccb=1-5&_nc_sid=ae9488&_nc_ohc=FEXmzxaJsqgAX_CoZ0j&_nc_ht=scontent.fsgn7-1.fna&oh=03_AVI-9-usblK63qWsR5Oxcd62fWAU8eITJe-jDeD2-zMDQQ&oe=62929296">
+        <img class=" w-[850px] h-[450px]" src="../../public/imgs/miku.png">
       </div>
 
     </div>

@@ -7,13 +7,15 @@ module.exports = (app) => {
 
     router_user.route("/")
         .get( users.getAllUsers)
-        .delete([authJwt.verifyToken, authJwt.isModerator], users.deleteAll)
+        // .delete([authJwt.verifyToken, authJwt.isModerator], users.deleteAll)
+        .delete(users.deleteAll)
 
 
     router_user.route("/:id")
         .get(users.findOne)
         .put(users.update)
-        .delete([authJwt.verifyToken, authJwt.isModerator], users.delete)
+        // .delete([authJwt.verifyToken, authJwt.isModerator], users.delete)
+        .delete(users.delete)
 
     router_user.route("/test/all")
         .get(users.allAccess); 
